@@ -1,35 +1,42 @@
 #!/bin/bash
 
 #############################################################################################
-# This script builds Marlin firmware from git. How to use
+# This script builds Marlin firmware from git. 
+# How to use
+#
 # chmod +x ./build.sh
 # ./build.sh
+#
+# Note: there is no need to run this script with sudo
+#############################################################################################
 
-# Exit on any error
+# exit on any error, this should always be enabled first in any build script
 set -e
 
-
-
 #############################################################################################
-# you can override behaviour of build script with the variables in this block. Beyond this,
-# variables are not intended for tweaking unless you know what you're doing.
+# This block contains variables you can set
 
 # printer to target. Path must exist in marlin config repo under /config/examples
 PRINTER_PROFILE="Creality/Ender-3/CrealityV427"
 
-# By default, this script builds the latest tag in the Marlin. You should always build release
-# tags, and not the latest code in master. 
+# platformio target platform. The default platform is "mega2560" and seems to require overriding
+TARGET_PLATFORM="STM32F103RET6_creality"
+
+# If you want to force a build branch or tag, do so here, else this script will always build 
+# the latest tag.
 BUILD_TAG=""
 
-# source for marlin + configs. Change this if you want to build code from another git repo.
+# source for marlin configs. Change these if you want to build code from another git repo.
 MARLIN_MAIN_REPO=https://github.com/MarlinFirmware/Marlin
 MARLIN_CONFIG_REPO=https://github.com/MarlinFirmware/Configurations
-
 #############################################################################################
+
+
+
 
 CWD=$(pwd)
 
-# folder to clone marlin into
+# folders to clone marlin into
 MARLIN_MAIN_DIR=$(readlink -f ./Marlin)
 MARLIN_CONFIG_DIR=$(readlink -f ./MarlinConfig)
 
@@ -92,25 +99,16 @@ fi
 
 
 
-# overwrite marlin stock config with printer profiles
+# overwrite marlin stock config with requested profiles
 cp $PRINTER_PROFILE_SOURCE/. -R $PRINTER_PROFILE_TARGET
 
-# overwrite platformio vars with required
+
+# overwrite platformio vars with required variables to build
+# building for mega2560 doesn't work, need to force STM32F103RET6_creality
 DEFAULT_ENVS="default_envs = mega2560"
-REQUIRED_ENVS="default_envs = STM32F103RET6_creality"
+REQUIRED_ENVS="default_envs = ${TARGET_PLATFORM}"
 sed -i "s/$DEFAULT_ENVS/$REQUIRED_ENVS/" $MARLIN_MAIN_DIR/platformio.ini
 
-# install avr for mega support
-#arduino-cli core install arduino:avr
-#arduino-cli lib install U8glib-HAL
 cd $MARLIN_MAIN_DIR
+# running platformio run does all the building for us - easy!
 pio run
-
-# build with arduino-cli
-#arduino-cli \
-#    compile \
-#    --fqbn arduino:avr:mega:cpu=atmega2560 \
-#    --build-path build \
-#    --build-cache-path build-cache \
-#    -v \
-#    "${PRINTER_PROFILE_TARGET}/Marlin.ino"
