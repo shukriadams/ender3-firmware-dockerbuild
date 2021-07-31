@@ -1,0 +1,16 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+
+    config.vm.box = "ubuntu/focal64"
+    config.vm.synced_folder "./..", "/vagrant"
+    config.vm.hostname = "ender3-firmware"
+    config.vm.provision :shell, path: "provision.sh"
+    config.vm.provider :virtualbox do |v|
+        v.customize ["modifyvm", :id, "--memory", 1048]
+        # change this name as needed
+        v.name = "ender3-firmware"
+    end
+
+end
