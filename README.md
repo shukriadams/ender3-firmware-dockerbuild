@@ -2,4 +2,16 @@
 
 Build system to compile Marlin for Creality Ender3 in a docker container. Ideal for CI systems, but can also be used locally. 
 
-    work-in-progress
+Uses the docker image from https://github.com/shukriadams/docker-platformio
+
+## How to
+
+To build in docker container use
+
+    sh ./build-in-docker
+
+If you have platformio installed locally (f.egs if running in Vagrant) use
+
+    chmod +x build.sh
+    ./build.sh
+
