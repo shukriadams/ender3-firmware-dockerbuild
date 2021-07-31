@@ -15,3 +15,4 @@ If you have platformio installed locally (f.egs if running in Vagrant) use
     chmod +x build.sh
     ./build.sh
 
+The compiled firmware is Marlin\.pio\build\STM32F103RET6_creality/*.bin. Copy this to an SDcard, put the card in your Ender3 and start it.
